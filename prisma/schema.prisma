@@ -71,7 +71,8 @@ model JournalEntry {
   tokenTransactionId Int
   account            Account         @relation(fields: [accountId], references: [id])
   accountId          String
-  // the ideal would be NUMERIC but it is not supported by Prisma yet https://prismadb.readthedocs.io/en/latest/data-types/, https://www.prisma.io/dataguide/postgresql/introduction-to-data-types#other-useful-types
+  // https://prismadb.readthedocs.io/en/latest/data-types/, https://www.prisma.io/dataguide/postgresql/introduction-to-data-types#other-useful-types
+  // https://stackoverflow.com/questions/33730538/difference-between-decimal-and-numeric-datatype-in-psql
   // credit               Decimal @db.Money
   debit              Decimal?        @default(0) @db.Money
   credit             Decimal?        @default(0) @db.Money

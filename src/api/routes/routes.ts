@@ -1,12 +1,14 @@
 import { Router } from "express";
-import { tokenInput } from "../controllers/tokenInput";
+import { tokensAssignationAPI as tokensAssignationAPI } from "../controllers/tokensAssignation";
 
 import bodyParser from "body-parser";
+import { tokensExchangeAPI } from "../controllers/tokensExchange";
 
 var jsonParser = bodyParser.json();
 
 const routes = Router();
 
-routes.post("/tokenInput", jsonParser, tokenInput);
+routes.post("/tokens-assignation", jsonParser, tokensAssignationAPI);
+routes.post("/tokens-exchange", jsonParser, tokensExchangeAPI);
 
 export default routes;
