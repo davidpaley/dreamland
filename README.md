@@ -1,51 +1,38 @@
-# REST API Example
+# Description
 
-This example shows how to implement a **REST API with TypeScript** using [Express](https://expressjs.com/) and [Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client). It is based on a SQLite database, you can find the database file with some dummy data at [`./prisma/dev.db`](./prisma/dev.db).
+Node API to keep track of double-entry accounting ledgers for USD and DREAM token
 
 ## Getting started
 
-### 1. Download example and install dependencies
-
-Download this example:
-
-```
-curl https://codeload.github.com/prisma/prisma-examples/tar.gz/latest | tar -xz --strip=2 prisma-examples-latest/typescript/rest-express
-```
-
-Install npm dependencies:
-
-```
-cd rest-express
-npm install
-```
-
-<details><summary><strong>Alternative:</strong> Clone the entire repo</summary>
+### 1. Clone the project and install dependencies
 
 Clone this repository:
 
 ```
-git clone git@github.com:prisma/prisma-examples.git --depth=1
+git clone git@github.com:davidpaley/dreamland.git
 ```
 
 Install npm dependencies:
 
 ```
-cd prisma-examples/typescript/rest-express
+cd dreamland
 npm install
 ```
 
-</details>
+### 2. Set the Database URL and create and seed the database
 
-### 2. Create and seed the database
+- Create `.env` file with 
+```
+DB_URL=postgres://[postgresUser]:[postgresPassword]@[urlConnection]/[database]
+```
 
 Run the following command to create your SQLite database file. This also creates the `User` and `Post` tables that are defined in [`prisma/schema.prisma`](./prisma/schema.prisma):
 
 ```
-npx prisma migrate dev --name init
+npx prisma migrate dev
 ```
 
 When `npx prisma migrate dev` is executed against a newly created database, seeding is also triggered. The seed file in [`prisma/seed.ts`](./prisma/seed.ts) will be executed and your database will be populated with the sample data.
-
 
 ### 3. Start the REST API server
 
@@ -55,6 +42,7 @@ npm run dev
 
 The server is now running on `http://localhost:3000`. You can now the API requests, e.g. [`http://localhost:3000/feed`](http://localhost:3000/feed).
 
+<!--
 ## Using the REST API
 
 You can access the REST API of the server using the following endpoints:
@@ -236,7 +224,7 @@ const userWithUpdatedProfile = await prisma.user.update({
 
 ## Switch to another database (e.g. PostgreSQL, MySQL, SQL Server, MongoDB)
 
-If you want to try this example with another database than SQLite, you can adjust the the database connection in [`prisma/schema.prisma`](./prisma/schema.prisma) by reconfiguring the `datasource` block. 
+If you want to try this example with another database than SQLite, you can adjust the the database connection in [`prisma/schema.prisma`](./prisma/schema.prisma) by reconfiguring the `datasource` block.
 
 Learn more about the different connection configurations in the [docs](https://www.prisma.io/docs/reference/database-reference/connection-urls).
 
@@ -318,4 +306,4 @@ generator client {
 - Check out the [Prisma docs](https://www.prisma.io/docs)
 - Share your feedback in the [`prisma2`](https://prisma.slack.com/messages/CKQTGR6T0/) channel on the [Prisma Slack](https://slack.prisma.io/)
 - Create issues and ask questions on [GitHub](https://github.com/prisma/prisma/)
-- Watch our biweekly "What's new in Prisma" livestreams on [Youtube](https://www.youtube.com/channel/UCptAHlN1gdwD89tFM3ENb6w)
+- Watch our biweekly "What's new in Prisma" livestreams on [Youtube](https://www.youtube.com/channel/UCptAHlN1gdwD89tFM3ENb6w) -->

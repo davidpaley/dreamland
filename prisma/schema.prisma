@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -40,7 +41,7 @@ model TokenTrasaction {
   userId       Int
   description  String
   date         DateTime
-  exchangeRate Float?
+  exchangeRate Decimal?       @db.Money
   JournalEntry JournalEntry[]
 }
 
@@ -72,36 +73,36 @@ model JournalEntry {
   accountId          String
   // the ideal would be NUMERIC but it is not supported by Prisma yet https://prismadb.readthedocs.io/en/latest/data-types/, https://www.prisma.io/dataguide/postgresql/introduction-to-data-types#other-useful-types
   // credit               Decimal @db.Money
-  debit              Float?          @default(0)
-  credit             Float?          @default(0)
+  debit              Decimal?        @default(0) @db.Money
+  credit             Decimal?        @default(0) @db.Money
   date               DateTime
 
 }
 
 model AccountBalance {
-  id        Int     @id @default(autoincrement())
-  ledger    Ledger  @relation(fields: [ledgerId], references: [id])
+  id        Int      @id @default(autoincrement())
+  ledger    Ledger   @relation(fields: [ledgerId], references: [id])
   ledgerId  String
-  user      User    @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   userId    Int
-  account   Account @relation(fields: [accountId], references: [id])
+  account   Account  @relation(fields: [accountId], references: [id])
   accountId String
-  debit     Float?  @default(0)
-  credit    Float?  @default(0)
+  debit     Decimal? @default(0) @db.Money
+  credit    Decimal? @default(0) @db.Money
 
   @@unique([ledgerId, userId, accountId])
 }
 
 model DailyBalance {
   dailyId   Int
-  ledger    Ledger  @relation(fields: [ledgerId], references: [id])
+  ledger    Ledger   @relation(fields: [ledgerId], references: [id])
   ledgerId  String
-  user      User    @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   userId    Int
-  account   Account @relation(fields: [accountId], references: [id])
+  account   Account  @relation(fields: [accountId], references: [id])
   accountId String
-  debit     Float?  @default(0)
-  credit    Float?  @default(0)
+  debit     Decimal? @default(0) @db.Money
+  credit    Decimal? @default(0) @db.Money
 
   @@unique([dailyId, ledgerId, userId, accountId])
 }
