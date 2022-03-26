@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+// auto generate
+model Ledger {
+  id          String @id
+  description String @unique
+
+  JournalEntry JournalEntry[]
+
+  AccountBalance AccountBalance[]
+  dailyBalance   DailyBalance[]
+}
+
+// auto generate
+model User {
+  id                Int               @id @default(autoincrement())
+  email             String            @unique
+  name              String?
+  tokenTransactions TokenTrasaction[]
+  // The following field is not saved in the Database. For info https://www.prisma.io/docs/concepts/components/prisma-schema/relations
+  // UserTokenTransactions JournalEntry[]
+  // BookEntry             BookEntry[]
+  // DollarBalance         DollarBalance[]
+  // DailyBalance          DailyBalance[]
+  JournalEntry      JournalEntry[]
+  AccountBalance    AccountBalance[]
+  dailyBalance      DailyBalance[]
+}
+
+model TokenTrasaction {
+  id           Int            @id @default(autoincrement())
+  user         User           @relation(fields: [userId], references: [id])
+  userId       Int
+  description  String
+  date         DateTime
+  exchangeRate Float?
+  JournalEntry JournalEntry[]
+}
+
+// model JournalEntryType {
+//   id         String @id
+// }
+
+// auto generate
+model Account {
+  id          String
+  description String
+  type        String
+
+  JournalEntry   JournalEntry[]
+  AccountBalance AccountBalance[]
+  dailyBalance   DailyBalance[]
+  @@unique([id])
+}
+
+model JournalEntry {
+  id                 Int             @id @default(autoincrement())
+  ledger             Ledger          @relation(fields: [ledgerId], references: [id])
+  ledgerId           String
+  user               User            @relation(fields: [userId], references: [id])
+  userId             Int
+  tokenTransaction   TokenTrasaction @relation(fields: [tokenTransactionId], references: [id])
+  tokenTransactionId Int
+  account            Account         @relation(fields: [accountId], references: [id])
+  accountId          String
+  // the ideal would be NUMERIC but it is not supported by Prisma yet https://prismadb.readthedocs.io/en/latest/data-types/, https://www.prisma.io/dataguide/postgresql/introduction-to-data-types#other-useful-types
+  // credit               Decimal @db.Money
+  debit              Float?          @default(0)
+  credit             Float?          @default(0)
+  date               DateTime
+
+}
+
+model AccountBalance {
+  id        Int     @id @default(autoincrement())
+  ledger    Ledger  @relation(fields: [ledgerId], references: [id])
+  ledgerId  String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+  debit     Float?  @default(0)
+  credit    Float?  @default(0)
+
+  @@unique([ledgerId, userId, accountId])
+}
+
+model DailyBalance {
+  dailyId   Int
+  ledger    Ledger  @relation(fields: [ledgerId], references: [id])
+  ledgerId  String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+  debit     Float?  @default(0)
+  credit    Float?  @default(0)
+
+  @@unique([dailyId, ledgerId, userId, accountId])
+}
