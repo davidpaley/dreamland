@@ -10,13 +10,14 @@
 
 1. Chequeo en la DailyAccountBalance la account (TOKEN_INVENTORY) para ese usuario, en esa currency, con el ID por el dia
         a) resta entre debit y credit diario = tokens_to_exchange
-2. Actualizo la tabla TOKEN_HISTORY
+2. Actualizo la tabla TOKEN_HISTORY 
+        a) obtengo el valor del exchange
+        b) agrego registro en la tabla con el valor del exchange rate
 3. Actualizo Journal entries para Token Ledger
         a) agrego registro con TOKENS_EXCHANGED, debit (con la diferencia diaria calculada en 1.a) (tokens_to_exchange)
         b) agrego registro con TOKEN_INVENTORY, credit, con el mismo valor del punto anterior (tokens_to_exchange)
 4. Actualizo tablas de balances diarias y totales para Tokens (TOKENS_EXCHANGED y TOKEN_INVENTORY record para ese usuario)
 5. Actualizo Journal entries para USD Ledger
-        a) obtengo el valor del exchange
-        b) agrego registro con account USD_INVENTORY, debit (con la cantidad de tokens por el valor del exchange)
-        c) agrego el registro con account USD_EARNED, credit, con mismo nro q el monto anterior
+        a) agrego registro con account USD_INVENTORY, debit (con la cantidad de tokens por el valor del exchange)
+        b) agrego el registro con account USD_EARNED, credit, con mismo nro q el monto anterior
 6. Actualizo tablas de balances diarias y totales para USD

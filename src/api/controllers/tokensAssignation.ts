@@ -6,135 +6,12 @@ import {
 } from "../../constants/tokens";
 
 import { Request, Response } from "express";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { getDailyBalanceId } from "../../utils/dates";
 import {
   updateAllBalances,
-  updateDailyBalance,
-  updateJournalEntriesAccounts,
-  updateTotalBalance,
+  addJournalEntriesRecords,
 } from "../../utils/database";
-
-// const updateTotalBalance = async (
-//   ledgerId: string,
-//   userId: number,
-//   tokenQuantity: Prisma.Decimal,
-//   prisma: Omit<
-//     PrismaClient<
-//       Prisma.PrismaClientOptions,
-//       never,
-//       Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
-//     >,
-//     "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
-//   >
-// ) => {
-//   // update tokens inventory (asset) account
-//   await prisma.accountBalance.upsert({
-//     where: {
-//       ledgerId_userId_accountId: {
-//         ledgerId,
-//         userId,
-//         accountId: ACCOUNT_IDS.tokensInventory,
-//       },
-//     },
-//     update: {
-//       debit: {
-//         increment: tokenQuantity,
-//       },
-//     },
-//     create: {
-//       ledgerId,
-//       userId,
-//       accountId: ACCOUNT_IDS.tokensInventory,
-//       debit: tokenQuantity,
-//     },
-//   });
-//   // update tokens earned (income) account
-//   await prisma.accountBalance.upsert({
-//     where: {
-//       ledgerId_userId_accountId: {
-//         ledgerId,
-//         userId,
-//         accountId: ACCOUNT_IDS.tokensEarned,
-//       },
-//     },
-//     update: {
-//       credit: {
-//         increment: tokenQuantity,
-//       },
-//     },
-//     create: {
-//       ledgerId,
-//       userId,
-//       accountId: ACCOUNT_IDS.tokensEarned,
-//       credit: tokenQuantity,
-//     },
-//   });
-// };
-
-// const updateDailyBalance = async (
-//   dailyId: number,
-//   ledgerId: string,
-//   userId: number,
-//   tokenQuantity: Prisma.Decimal,
-//   prisma: Omit<
-//     PrismaClient<
-//       Prisma.PrismaClientOptions,
-//       never,
-//       Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
-//     >,
-//     "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
-//   >
-// ) => {
-//   // update tokens inventory (asset) account
-//   await prisma.dailyBalance.upsert({
-//     where: {
-//       dailyId_ledgerId_userId_accountId: {
-//         dailyId,
-//         ledgerId,
-//         userId,
-//         accountId: ACCOUNT_IDS.tokensInventory,
-//       },
-//     },
-//     update: {
-//       debit: {
-//         increment: tokenQuantity,
-//       },
-//     },
-//     create: {
-//       dailyId,
-//       ledgerId,
-//       userId,
-//       accountId: ACCOUNT_IDS.tokensInventory,
-//       debit: tokenQuantity,
-//     },
-//   });
-//   // update tokens earned (income) account
-//   await prisma.dailyBalance.upsert({
-//     where: {
-//       dailyId_ledgerId_userId_accountId: {
-//         dailyId,
-//         ledgerId,
-//         userId,
-//         accountId: ACCOUNT_IDS.tokensEarned,
-//       },
-//     },
-//     update: {
-//       credit: {
-//         increment: tokenQuantity,
-//       },
-//     },
-//     create: {
-//       dailyId,
-//       ledgerId,
-//       userId,
-//       accountId: ACCOUNT_IDS.tokensEarned,
-//       credit: tokenQuantity,
-//     },
-//   });
-// };
-
-// app.post(`/token-assignation`, );
 
 export const tokensAssignationAPI = async (req: Request, res: Response) => {
   const { userId, tokenQuantity } = req.body;
@@ -162,7 +39,8 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
   });
   if (
     tokenEarnedDailyBalance?.credit &&
-    tokenEarnedDailyBalance?.credit.add(tokenQuantity) >=
+    // Prisma uses under the hood : decimal.js https://mikemcl.github.io/decimal.js/#sub
+    tokenEarnedDailyBalance?.credit.add(tokenQuantity) >
       new Prisma.Decimal(TOKEN_DAILY_MAX_AMOUNT)
   ) {
     res.status(200).send({
@@ -184,7 +62,7 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
         },
       });
 
-      await updateJournalEntriesAccounts({
+      await addJournalEntriesRecords({
         ledgerId,
         userId,
         tokenTransactionId: tokenTransaction.id,
@@ -194,27 +72,6 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
         accountForCredit: ACCOUNT_IDS.tokensEarned,
         amount: tokenQuantity,
       });
-      // update journalEntry
-      // const journalEntryRecord = {
-      //   ledgerId,
-      //   userId,
-      //   tokenTransactionId: tokenTransaction.id,
-      //   date: currentDate,
-      // };
-      // await prisma.journalEntry.createMany({
-      //   data: [
-      //     {
-      //       ...journalEntryRecord,
-      //       accountId: ACCOUNT_IDS.tokensInventory,
-      //       debit: tokenQuantity,
-      //     },
-      //     {
-      //       ...journalEntryRecord,
-      //       accountId: ACCOUNT_IDS.tokensEarned,
-      //       credit: tokenQuantity,
-      //     },
-      //   ],
-      // });
 
       console.log("Journal entries updated");
 
@@ -236,7 +93,7 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
   } catch (e: unknown) {
     console.log(e);
     res.status(500).send({
-      message: "Failed adding Tokens to the user",
+      message: `Failed adding Tokens to the user ${userId}`,
     });
   }
 };

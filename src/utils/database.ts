@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 
-type UpdateJournalEntry = {
+type AddJournalEntry = {
   ledgerId: string;
   userId: number;
   tokenTransactionId: number;
@@ -18,7 +18,7 @@ type UpdateJournalEntry = {
   amount: Prisma.Decimal;
 };
 
-export const updateJournalEntriesAccounts = async ({
+export const addJournalEntriesRecords = async ({
   ledgerId,
   userId,
   tokenTransactionId,
@@ -27,7 +27,7 @@ export const updateJournalEntriesAccounts = async ({
   accountForDebit,
   accountForCredit,
   amount,
-}: UpdateJournalEntry) => {
+}: AddJournalEntry) => {
   const journalEntryRecord = {
     ledgerId,
     userId,
