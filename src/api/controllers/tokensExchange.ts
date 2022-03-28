@@ -19,81 +19,85 @@ const exchangeTokens = async (
   const currentDate = new Date();
   const dailyId = getDailyBalanceId();
   let tokenTransaction: TokenTrasaction;
-  let exchangeRate: Prisma.Decimal;
-  // TODO: Add try catch when using transaction from Prisma
-  await prisma.$transaction(async (prisma) => {
-    exchangeRate = await getExchangePrice();
-
-    tokenTransaction = await prisma.tokenTrasaction.create({
-      data: {
+  const exchangeRate: Prisma.Decimal = await getExchangePrice();
+  let amount: Prisma.Decimal;
+  // Couldn't do everything in one transaction, because Prisma can't support in one transaction so many concurrent writes
+  // issue https://github.com/prisma/prisma/issues/11750
+  try {
+    await prisma.$transaction(async (prisma) => {
+      tokenTransaction = await prisma.tokenTrasaction.create({
+        data: {
+          userId,
+          description: TOKEN_TRANSACTION_DESCRIPTION.tokensExchanged,
+          date: currentDate,
+          exchangeRate,
+        },
+      });
+      console.log("token transaction table updated");
+      // Update Token Ledger
+      await addJournalEntriesRecords({
+        ledgerId: LEDGER_IDS.token,
         userId,
-        description: TOKEN_TRANSACTION_DESCRIPTION.tokensExchanged,
+        tokenTransactionId: tokenTransaction.id,
         date: currentDate,
-        exchangeRate,
-      },
-    });
-    console.log("token transaction table updated");
-    // Update Token Ledger
-    await addJournalEntriesRecords({
-      ledgerId: LEDGER_IDS.token,
-      userId,
-      tokenTransactionId: tokenTransaction.id,
-      date: currentDate,
-      prisma,
-      accountForDebit: ACCOUNT_IDS.tokensExchanged,
-      accountForCredit: ACCOUNT_IDS.tokensInventory,
-      amount: amountOfTokensToExchange,
-    });
-    console.log("Journal entries for Token Ledger updated");
+        prisma,
+        accountForDebit: ACCOUNT_IDS.tokensExchanged,
+        accountForCredit: ACCOUNT_IDS.tokensInventory,
+        amount: amountOfTokensToExchange,
+      });
+      console.log("Journal entries for Token Ledger updated");
 
-    console.log({
-      balancesDataToken: {
+      amount = amountOfTokensToExchange.times(exchangeRate);
+      // Update USD Ledger
+      await addJournalEntriesRecords({
+        ledgerId: LEDGER_IDS.usd,
+        userId,
+        tokenTransactionId: tokenTransaction.id,
+        date: currentDate,
+        accountForDebit: ACCOUNT_IDS.usdInventory,
+        accountForCredit: ACCOUNT_IDS.usdEarned,
+        amount,
+        prisma,
+      });
+      console.log("Journal entries updated for USD Ledger");
+    });
+  } catch (e) {
+    console.log(e);
+    console.log("Error setting the Token Ledger. Notifying the admin");
+    // TODO: send notifications with Token amount, userId, date and accounts
+    throw e;
+  }
+  try {
+    await prisma.$transaction(async (prisma) => {
+      await updateAllBalances({
         dailyId,
         ledgerId: LEDGER_IDS.token,
         userId,
         amount: amountOfTokensToExchange,
         accountForDebit: ACCOUNT_IDS.tokensExchanged,
         accountForCredit: ACCOUNT_IDS.tokensInventory,
-      },
-    });
-    await updateAllBalances({
-      dailyId,
-      ledgerId: LEDGER_IDS.token,
-      userId,
-      amount: amountOfTokensToExchange,
-      accountForDebit: ACCOUNT_IDS.tokensExchanged,
-      accountForCredit: ACCOUNT_IDS.tokensInventory,
-      prisma,
-    });
-    console.log("Balances updated for Token Ledger");
-  });
+        prisma,
+      });
+      console.log("Balances updated for Token Ledger");
+      await updateAllBalances({
+        dailyId,
+        ledgerId: LEDGER_IDS.usd,
+        userId,
+        accountForDebit: ACCOUNT_IDS.usdInventory,
+        accountForCredit: ACCOUNT_IDS.usdEarned,
+        amount,
+        prisma,
+      });
 
-  await prisma.$transaction(async (prisma) => {
-    const amount = amountOfTokensToExchange.times(exchangeRate);
-    // Update USD Ledger
-    await addJournalEntriesRecords({
-      ledgerId: LEDGER_IDS.usd,
-      userId,
-      tokenTransactionId: tokenTransaction.id,
-      date: currentDate,
-      accountForDebit: ACCOUNT_IDS.usdInventory,
-      accountForCredit: ACCOUNT_IDS.usdEarned,
-      amount,
-      prisma,
+      console.log("Balances updated for USD Ledger");
     });
-    console.log("Journal entries updated for USD Ledger");
-
-    await updateAllBalances({
-      dailyId,
-      ledgerId: LEDGER_IDS.usd,
-      userId,
-      accountForDebit: ACCOUNT_IDS.usdInventory,
-      accountForCredit: ACCOUNT_IDS.usdEarned,
-      amount,
-      prisma,
-    });
-    console.log("Balances updated for USD Ledger");
-  });
+  } catch (e: unknown) {
+    console.log(e);
+    console.log("Error setting the Balances");
+    // TODO: send notifications with USD amount, userId, date and accounts
+    // Call service to re-calculate the balances for this user (the data of journalEntry table is still accurate)
+    throw e;
+  }
 };
 
 export const tokensExchangeAPI = async (req: Request, res: Response) => {

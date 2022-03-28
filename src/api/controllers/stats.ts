@@ -29,9 +29,9 @@ export const statsAPI = async (req: Request, res: Response) => {
   res.json({
     data: {
       tokensWonOnCurrentDay: tokenEarnedThisDayRecord?.credit || 0,
-      totalUsdInAccount: usdAmountRecord?.debit?.minus(
-        usdAmountRecord?.credit || 0
-      ),
+      totalUsdInAccount: usdAmountRecord
+        ? usdAmountRecord?.debit?.minus(usdAmountRecord?.credit || 0)
+        : 0,
     },
   });
 };
