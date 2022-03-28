@@ -41,7 +41,7 @@ model TokenTrasaction {
   userId       Int
   description  String
   date         DateTime
-  exchangeRate Decimal?       @db.Money
+  exchangeRate Decimal?       @db.Decimal
   JournalEntry JournalEntry[]
 }
 
@@ -73,9 +73,9 @@ model JournalEntry {
   accountId          String
   // https://prismadb.readthedocs.io/en/latest/data-types/, https://www.prisma.io/dataguide/postgresql/introduction-to-data-types#other-useful-types
   // https://stackoverflow.com/questions/33730538/difference-between-decimal-and-numeric-datatype-in-psql
-  // credit               Decimal @db.Money
-  debit              Decimal?        @default(0) @db.Money
-  credit             Decimal?        @default(0) @db.Money
+  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#model-field-scalar-types
+  debit              Decimal?        @default(0) @db.Decimal
+  credit             Decimal?        @default(0) @db.Decimal
   date               DateTime
 
 }
@@ -88,8 +88,8 @@ model AccountBalance {
   userId    Int
   account   Account  @relation(fields: [accountId], references: [id])
   accountId String
-  debit     Decimal? @default(0) @db.Money
-  credit    Decimal? @default(0) @db.Money
+  debit     Decimal? @default(0) @db.Decimal
+  credit    Decimal? @default(0) @db.Decimal
 
   @@unique([ledgerId, userId, accountId])
 }
@@ -102,8 +102,8 @@ model DailyBalance {
   userId    Int
   account   Account  @relation(fields: [accountId], references: [id])
   accountId String
-  debit     Decimal? @default(0) @db.Money
-  credit    Decimal? @default(0) @db.Money
+  debit     Decimal? @default(0) @db.Decimal
+  credit    Decimal? @default(0) @db.Decimal
 
   @@unique([dailyId, ledgerId, userId, accountId])
 }

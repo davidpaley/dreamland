@@ -112,8 +112,14 @@ export const tokensExchangeAPI = async (req: Request, res: Response) => {
   let usersWithErrorsCounter = 0;
   for (let dailyBalance of dailyBalanceOfUsersToUpdate) {
     const { debit, credit, userId } = dailyBalance;
+
+    // Error from Prisma, with raw queries it returns type number instead of Decimal.
+    // Anyway as I am converting it before making any operation, it is not affecting the result
+    console.log({ debitType: typeof debit });
+
     // TODO: make debit and credit not optional (with default in 0 is ok)
     const amountOfTokensToExchange =
+      // The problem with the Prisma rawQuery is that it doesn't return the correct type for the debit and credit (it returns numbers as type)
       new Prisma.Decimal(debit || 0).minus(new Prisma.Decimal(credit || 0)) ||
       new Prisma.Decimal(0);
     console.log({

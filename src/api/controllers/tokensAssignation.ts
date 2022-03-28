@@ -15,7 +15,8 @@ import {
 
 export const tokensAssignationAPI = async (req: Request, res: Response) => {
   const { userId, tokenQuantity } = req.body;
-  console.log({ userId, tokenQuantity });
+
+  const amount = new Prisma.Decimal(tokenQuantity);
   if (!userId || !tokenQuantity) {
     res.status(400).send({
       message: "You need to set the userId and the tokenQuantity",
@@ -40,7 +41,7 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
   if (
     tokenEarnedDailyBalance?.credit &&
     // Prisma uses under the hood : decimal.js https://mikemcl.github.io/decimal.js/#sub
-    tokenEarnedDailyBalance?.credit.add(tokenQuantity) >
+    tokenEarnedDailyBalance?.credit.add(amount) >
       new Prisma.Decimal(TOKEN_DAILY_MAX_AMOUNT)
   ) {
     res.status(200).send({
@@ -70,7 +71,7 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
         prisma,
         accountForDebit: ACCOUNT_IDS.tokensInventory,
         accountForCredit: ACCOUNT_IDS.tokensEarned,
-        amount: tokenQuantity,
+        amount,
       });
 
       console.log("Journal entries updated");
@@ -79,7 +80,7 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
         dailyId,
         ledgerId,
         userId,
-        amount: tokenQuantity,
+        amount,
         accountForDebit: ACCOUNT_IDS.tokensInventory,
         accountForCredit: ACCOUNT_IDS.tokensEarned,
         prisma,
