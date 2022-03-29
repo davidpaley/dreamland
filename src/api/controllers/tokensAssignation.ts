@@ -14,7 +14,7 @@ import {
 } from "../../utils/database";
 
 export const tokensAssignationAPI = async (req: Request, res: Response) => {
-  const { userId, tokenQuantity } = req.body;
+  const { userId, tokenQuantity, specificHour, specificMinutes } = req.body;
 
   const amount = new Prisma.Decimal(tokenQuantity);
   if (!userId || !tokenQuantity) {
@@ -26,6 +26,9 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
 
   const ledgerId = LEDGER_IDS.token;
   const currentDate = new Date();
+  if (specificHour) {
+    currentDate.setHours(specificHour, specificMinutes || 0);
+  }
   const dailyId = getDailyBalanceId();
 
   const tokenEarnedDailyBalance = await prisma.dailyBalance.findUnique({

@@ -52,7 +52,7 @@ export const usdHistory = async (req: Request, res: Response) => {
   });
   if (!usdEarnedThisDayRecord?.length) {
     res.status(200).send({
-      message: `No USD transactions for today for the user ${userId}`,
+      message: `No USD transactions for the user ${userId}`,
     });
     return;
   }
