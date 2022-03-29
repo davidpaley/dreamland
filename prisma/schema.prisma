@@ -12,7 +12,6 @@ datasource db {
   url      = env("DB_URL")
 }
 
-// auto generate
 model Ledger {
   id          String @id
   description String @unique
@@ -23,17 +22,12 @@ model Ledger {
   dailyBalance   DailyBalance[]
 }
 
-// auto generate
 model User {
   id                Int               @id @default(autoincrement())
   email             String            @unique
   name              String?
   tokenTransactions TokenTrasaction[]
   // The following field is not saved in the Database. For info https://www.prisma.io/docs/concepts/components/prisma-schema/relations
-  // UserTokenTransactions JournalEntry[]
-  // BookEntry             BookEntry[]
-  // DollarBalance         DollarBalance[]
-  // DailyBalance          DailyBalance[]
   JournalEntry      JournalEntry[]
   AccountBalance    AccountBalance[]
   dailyBalance      DailyBalance[]
@@ -49,11 +43,6 @@ model TokenTrasaction {
   JournalEntry JournalEntry[]
 }
 
-// model JournalEntryType {
-//   id         String @id
-// }
-
-// auto generate
 model Account {
   id          String
   description String

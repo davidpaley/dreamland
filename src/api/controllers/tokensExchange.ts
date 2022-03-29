@@ -95,7 +95,7 @@ const exchangeTokens = async (
     console.log(e);
     console.log("Error setting the Balances");
     // TODO: send notifications with USD amount, userId, date and accounts
-    // Call service to re-calculate the balances for this user (the data of journalEntry table is still accurate)
+    // Invalidate whole transaction. Check docs/edge-cases.
     throw e;
   }
 };
@@ -108,6 +108,7 @@ export const tokensExchangeAPI = async (req: Request, res: Response) => {
   // One possible solution would be to add a filed balance (with the result of the operation) in the dailyBalaceAccount table
   const dailyBalanceOfUsersToUpdate: DailyBalance[] =
     await prisma.$queryRaw`select * from public."DailyBalance" where debit-credit > '0' and "accountId" = ${ACCOUNT_IDS.tokensInventory} and "dailyId" = ${dailyId};`;
+
   if (!dailyBalanceOfUsersToUpdate?.length) {
     res.status(200).send({
       message: "No user to update",
@@ -119,7 +120,7 @@ export const tokensExchangeAPI = async (req: Request, res: Response) => {
 
     // Error from Prisma, with raw queries it returns type number instead of Decimal.
     // Anyway as I am converting it before making any operation, it is not affecting the result
-    console.log({ debitType: typeof debit });
+    console.log({ debitType: typeof debit }); // this is number
 
     // TODO: make debit and credit not optional (with default in 0 is ok)
     const amountOfTokensToExchange =
