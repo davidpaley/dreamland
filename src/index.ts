@@ -12,9 +12,3 @@ app.listen(3000, () =>
 🚀 Server ready at: http://localhost:3000`)
 );
 app.use("/api", routes);
-
-app.get("/", async (req, res) => {
-  res.status(200).send({
-    message: "Dreamland token API is ready to assign new tokens",
-  });
-});

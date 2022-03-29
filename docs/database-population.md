@@ -2,7 +2,7 @@
 
 ## Accounts
 
-Every ledger has different account
+Every ledger has different accounts
 
 ### Tokens Ledger Accounts
 
@@ -40,6 +40,8 @@ Endpoint GET `api/tokens-assignation`
 
 ### Process that validate every hour that all of those tokens are converted to dollars
 
+Endpoint GET `api/tokens-exchange`
+
 - Get all the users that made transactions that day and in the table DailyBalance, the `debit - credit` is not zero
 
 #### For every user
@@ -47,10 +49,14 @@ Endpoint GET `api/tokens-assignation`
 1. Check DailyAccountBalance, the account TOKEN_INVENTORY with the daily ID and get the amount `debit - credit`
 2. Update the table TokenTransaction with the new exchange
 3. Update JournalEntries table with the 2 records for the Token Ledger
-   a) Add record with TOKENS_EXCHANGED, debit (with the amount of tokens to exchange)
-   b) Add record with TOKEN_INVENTORY, credit, with the same amount
-4. Update daily balance table and account balance table with the totals (the records for TOKENS_EXCHANGED y TOKEN_INVENTORY)
+
+- Add record with TOKENS_EXCHANGED, debit (with the amount of tokens to exchange)
+- Add record with TOKEN_INVENTORY, credit, with the same amount
+
+4. Update daily balance table and account balance table with the totals (the records for TOKENS_EXCHANGED and TOKEN_INVENTORY)
 5. Update JournalEntries table for USD Ledger
-   a) Add record with USD_INVENTORY, debit (with the amount of tokens times the exchange rate of that moment)
-   b) Add record with USD_EARNED, credit, with the same value
+
+- Add record with USD_INVENTORY, debit (with the amount of tokens times the exchange rate of that moment)
+- Add record with USD_EARNED, credit, with the same value
+
 6. Update DailyBalance table and AccountBalance for USD (the records for USD_INVENTORY and USD_EARNED)
