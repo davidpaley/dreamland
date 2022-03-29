@@ -76,3 +76,14 @@ You could import in postman the file `dreamland.postman_collection.json` and int
 ## How the Database populate itself
 
 Find information [here](docs/database-population.md).
+
+# Infrastructure
+
+# Technical Debt
+
+- Add automated tests.
+  - Ideally 80% coverage
+  - The main thing to do would be to add integration tests for the exchange token and token assignation endpoints.
+- Create a cron service with [Node Cron](https://www.npmjs.com/package/node-cron) to execute the USD exchange automatically every at the end of every hour.
+- Create another cron service that check at the end of every day that the total balances of every user that we have in the balances account is ok with the data that we have in JournalEntry table.
+- RELACIONADO CON EDGE CASES => Create an endpoint/function to invalidate a transaction. We could have a column of isInvalidate (default `false`) for the different tables, and this, in the case of JournalEntry and TokenTrasaction, would be the only column that could be updated. This process would recalculate the balances for the day and the total ones.
