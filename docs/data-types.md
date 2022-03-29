@@ -1,4 +1,4 @@
-## Data types for ledger ammounts
+## Data types for ledger amounts
 
 As you can check [here](https://prismadb.readthedocs.io/en/latest/data-types/) and [here](https://www.prisma.io/dataguide/postgresql/introduction-to-data-types#numbers-and-numeric-values) to have a better precision for a number with decimals in Postgress, the best type to use is DECIMAL/NUMERIC (numeric and decimal is the same for Postgres, check [this](https://stackoverflow.com/questions/33730538/difference-between-decimal-and-numeric-datatype-in-psql)).
 

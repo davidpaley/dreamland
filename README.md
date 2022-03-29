@@ -77,7 +77,7 @@ You could import in postman the file `dreamland.postman_collection.json` and int
 
 Find information [here](docs/database-population.md).
 
-## Data types for ledger ammounts
+## Data types for ledger amounts
 
 Please, check [data-types](docs/data-types.md) file.
 

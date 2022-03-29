@@ -27,4 +27,4 @@ Also we should take into account possible hacking, use best practices to avoid t
 
 ## Read Replicas inconsistency
 
-If we are going to implement read replicas, to make our read queries faster, we have to take into account that some of them could have some delay to have the last updated data. We should be careful with transactional data around this, we could have some inconsistencies.
+If we are going to implement read replicas (check [infrastructure documentation](infrastructure.md)), to make our queries faster, we have to take into account that some of them could have some delay to have the last updated data. We should be careful with transactional data around this, we could have some inconsistencies. We should use read replicas only for get historical (check [history controler](../src/api/controllers/history.ts)) and stats (check [stats controler](../src/api/controllers/stats.ts)) data, we shouldn't use it for sencible data, for example, get the balances to make the tokens exchange.
