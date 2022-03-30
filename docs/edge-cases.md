@@ -28,3 +28,7 @@ Also we should take into account possible hacking, use best practices to avoid t
 ## Read Replicas inconsistency
 
 If we are going to implement read replicas (check [infrastructure documentation](infrastructure.md)), to make our queries faster, we have to take into account that some of them could have some delay to have the last updated data. We should be careful with transactional data around this, we could have some inconsistencies. We should use read replicas only for get historical (check [history controler](../src/api/controllers/history.ts)) and stats (check [stats controler](../src/api/controllers/stats.ts)) data, we shouldn't use it for sencible data, for example, get the balances to make the tokens exchange.
+
+## Concurrent tokens exchange for different users
+
+At the time of writting this document, the last version of Prisma could have an error with concurrent transactions https://github.com/prisma/prisma/issues/11750. It is estimated that for the next release, this will be fixed with properly tests. As this is a small MVP, I left for now the exchange of every user syncronously, if I would continue with this project, I would update Prisma version and check that I can make the concurrent tokens exchange correctly.
