@@ -31,7 +31,7 @@ Eventually, we are going to use EC2 (perhaps from the first step).
 
 Once we have EC2 instances, to track where instances are provisioned, we could use Amazon EC2 Global View. This would provide a centralized dashboard to see Amazon EC2 resources such as instances, VPCs, subnets, security groups, and volumes in all active Regions.
 
-Depending on the amount of traffic, we could implement Kubernetes to handle the API requests with EC2.
+We could implement Kubernetes to handle the API requests with EC2.
 
 ### Database across regions
 
