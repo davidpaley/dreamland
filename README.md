@@ -1,6 +1,6 @@
 # Description
 
-Node API to keep track of double-entry accounting ledgers for USD and DREAM token
+Node API to keep track of double-entry accounting ledgers for USD and DREAM tokens
 
 # Getting started
 
@@ -27,7 +27,7 @@ npm install
 DB_URL=postgres://[postgresUser]:[postgresPassword]@[urlConnection]/[database]
 ```
 
-Run the following command to create your SQLite database file. This also creates the `User` and `Post` tables that are defined in [`prisma/schema.prisma`](./prisma/schema.prisma):
+Run the following command to create your database file.
 
 ```
 npx prisma migrate dev
@@ -47,7 +47,7 @@ The server is now running on `http://localhost:3000`.
 
 ## Postman Collection
 
-You could import in postman the file `dreamland.postman_collection.json` and interact with the API.
+You could import in postman [this file](dreamland.postman_collection.json) `dreamland.postman_collection.json` and interact with the API.
 
 ## Endpoints
 
@@ -59,7 +59,7 @@ You could import in postman the file `dreamland.postman_collection.json` and int
 
 ### `POST`
 
-- `api/tokens-exchange`: Execute the exchange of all the tokens that the users has by USDs.
+- `api/tokens-exchange`: Execute the exchange of all the tokens that the users have by USDs.
 - `api/tokens-assignation`: Set an amount of tokens to a specific user
   - Body:
     - `userId: number` (required): The user ID
@@ -95,4 +95,4 @@ Please, check [this document](docs/edge-cases.md)
 - Create a cron service with [Node Cron](https://www.npmjs.com/package/node-cron) to execute the USD exchange automatically every day at the end of every hour.
 - Error tracking and actual logger (instead of console log). For doing this, I would use [Sentry](https://sentry.io/)
 - Use access tokens to access this API.
-- Check [edge cases file](docs/edge-cases.md)) and how I would avoid them.
+- Check [edge cases file](docs/edge-cases.md) and how I would avoid them.

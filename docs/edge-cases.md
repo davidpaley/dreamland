@@ -6,13 +6,13 @@ All the DB transactions are inside the [Prisma Transaction](https://www.prisma.i
 
 ### Rollback for transactions that were completed
 
-I could create an endpoint/function to invalidate a whole transaction (in the tables JournalEntry and TokenTrasaction) in case it is necessary. We could have a column of isInvalidate (default `false`) for the different tables, and this, in the case of JournalEntry and TokenTrasaction, would be the only column that could be updated. I could use this endpoint/function every time I need to invalidate a transaction. This process could update the values in the balance tables, calculating again this with what we have in the JournalEntry table.
+I could create an endpoint/function to invalidate a whole transaction (in the tables JournalEntry and TokenTrasaction) in case it is necessary. We could have a column with the name `isInvalidate` (default `false`) for the different tables, and this, in the case of JournalEntry and TokenTrasaction, would be the only column that could be updated. I could use this endpoint/function every time I need to invalidate a transaction. This process could update the values in the balance tables, calculating again this with what we have in the JournalEntry table.
 
 Also, I would create a cron process that check that the data on JournalEntry table is ok with the data in the Balance tables (daily and account balance). If it is not ok, it would make notifications and update the balances with the data of JournalEntry table.
 
 ## Error with the exchange rate API
 
-One possible problem is that the API that gets the echange rate to convert a token amount to USD do not work. In that case, all the process of tokens exchange should stop, wait some seconds and try again until all the tokens are converted correctly
+One possible problem is that the API that gets the echange rate to convert a token amount to USD do not work. In that case, all the processes of tokens exchange should stop, wait some seconds and try again until this API is OK.
 
 ## Access to sencible data
 
