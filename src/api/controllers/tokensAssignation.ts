@@ -14,7 +14,7 @@ import {
 } from "../../utils/database";
 
 export const tokensAssignationAPI = async (req: Request, res: Response) => {
-  const { userId, tokenQuantity, specificHour, specificMinutes } = req.body;
+  const { userId, tokenQuantity } = req.body;
 
   const amount = new Prisma.Decimal(tokenQuantity);
   if (!userId || !tokenQuantity) {
@@ -26,11 +26,11 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
 
   const ledgerId = LEDGER_IDS.token;
   const currentDate = new Date();
-  if (specificHour) {
-    currentDate.setHours(specificHour, specificMinutes || 0);
-  }
-  const dailyId = getDailyBalanceId();
 
+  const dailyId = getDailyBalanceId();
+  console.log(
+    `Token assignation for user ${userId} with the amount of DREAM tokens of ${amount}`
+  );
   const tokenEarnedDailyBalance = await prisma.dailyBalance.findUnique({
     where: {
       dailyId_ledgerId_userId_accountId: {
@@ -54,8 +54,6 @@ export const tokensAssignationAPI = async (req: Request, res: Response) => {
   }
 
   console.log("Token earned balance checked");
-  // TODO: Add Prisma transactions
-  // https://www.prisma.io/docs/concepts/components/prisma-client/transactions
   try {
     await prisma.$transaction(async (prisma) => {
       const tokenTransaction = await prisma.tokenTrasaction.create({

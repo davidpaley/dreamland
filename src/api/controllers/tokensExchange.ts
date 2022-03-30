@@ -15,17 +15,13 @@ const exchangeTokens = async (
   userId: number,
   amountOfTokensToExchange: Prisma.Decimal
 ) => {
-  //   const tokenLedgerId = LEDGER_IDS.token;
   const currentDate = new Date();
   const dailyId = getDailyBalanceId();
-  let tokenTransaction: TokenTrasaction;
-  const exchangeRate: Prisma.Decimal = await getExchangePrice();
-  let amount: Prisma.Decimal;
-  // Couldn't do everything in one transaction, because Prisma can't support in one transaction so many concurrent writes
-  // issue https://github.com/prisma/prisma/issues/11750
-  try {
-    await prisma.$transaction(async (prisma) => {
-      tokenTransaction = await prisma.tokenTrasaction.create({
+
+  await prisma.$transaction(
+    async (prisma) => {
+      const exchangeRate: Prisma.Decimal = await getExchangePrice();
+      const tokenTransaction = await prisma.tokenTrasaction.create({
         data: {
           userId,
           description: TOKEN_TRANSACTION_DESCRIPTION.tokensExchanged,
@@ -47,7 +43,7 @@ const exchangeTokens = async (
       });
       console.log("Journal entries for Token Ledger updated");
 
-      amount = amountOfTokensToExchange.times(exchangeRate);
+      const amount = amountOfTokensToExchange.times(exchangeRate);
       // Update USD Ledger
       await addJournalEntriesRecords({
         ledgerId: LEDGER_IDS.usd,
@@ -60,15 +56,7 @@ const exchangeTokens = async (
         prisma,
       });
       console.log("Journal entries updated for USD Ledger");
-    });
-  } catch (e) {
-    console.log(e);
-    console.log("Error setting the Token Ledger. Notifying the admin");
-    // TODO: send notifications with Token amount, userId, date and accounts
-    throw e;
-  }
-  try {
-    await prisma.$transaction(async (prisma) => {
+
       await updateAllBalances({
         dailyId,
         ledgerId: LEDGER_IDS.token,
@@ -90,22 +78,20 @@ const exchangeTokens = async (
       });
 
       console.log("Balances updated for USD Ledger");
-    });
-  } catch (e: unknown) {
-    console.log(e);
-    console.log("Error setting the Balances");
-    // TODO: send notifications with USD amount, userId, date and accounts
-    // Invalidate whole transaction. Check docs/edge-cases.
-    throw e;
-  }
+    },
+    {
+      timeout: 50000,
+    }
+  );
 };
 
 export const tokensExchangeAPI = async (req: Request, res: Response) => {
+  console.log("Processing tokens exchange");
   console.log("getting the users");
   const dailyId = getDailyBalanceId();
 
   // I had to use rawQuery because Prisma do not allow me to subtract the variables in the where, https://github.com/prisma/prisma/issues/5048
-  // One possible solution would be to add a filed balance (with the result of the operation) in the dailyBalaceAccount table
+  // One possible solution would be to add a field balance (with the result of the operation) in the dailyBalaceAccount table
   const dailyBalanceOfUsersToUpdate: DailyBalance[] =
     await prisma.$queryRaw`select * from public."DailyBalance" where debit-credit > '0' and "accountId" = ${ACCOUNT_IDS.tokensInventory} and "dailyId" = ${dailyId};`;
 
@@ -119,19 +105,12 @@ export const tokensExchangeAPI = async (req: Request, res: Response) => {
     const { debit, credit, userId } = dailyBalance;
 
     // Error from Prisma, with raw queries it returns type number instead of Decimal.
-    // Anyway as I am converting it before making any operation, it is not affecting the result
     console.log({ debitType: typeof debit }); // this is number
 
-    // TODO: make debit and credit not optional (with default in 0 is ok)
     const amountOfTokensToExchange =
       // The problem with the Prisma rawQuery is that it doesn't return the correct type for the debit and credit (it returns numbers as type)
       new Prisma.Decimal(debit || 0).minus(new Prisma.Decimal(credit || 0)) ||
       new Prisma.Decimal(0);
-    console.log({
-      debit: debit,
-      credit: credit,
-      amountOfTokensToExchange,
-    });
 
     if (!amountOfTokensToExchange) {
       throw "The SQL query get a user to update with 0 in their daily balance";
@@ -140,9 +119,14 @@ export const tokensExchangeAPI = async (req: Request, res: Response) => {
       console.log(
         `exchange for user ${userId} with the amount ${amountOfTokensToExchange} of tokens`
       );
+      // There could be problems with concurret transactions in Prisma right now
+      // For now, I would let this sync
+      // issue: https://github.com/prisma/prisma/issues/11750
       await exchangeTokens(userId, amountOfTokensToExchange);
     } catch (e: unknown) {
-      console.log(`Error for user ${userId}`);
+      console.log(
+        `Error for user ${userId} exchanging the amount of tokens ${amountOfTokensToExchange}`
+      );
       console.log(e);
       usersWithErrorsCounter++;
     }

@@ -64,8 +64,6 @@ You could import in postman the file `dreamland.postman_collection.json` and int
   - Body:
     - `userId: number` (required): The user ID
     - `tokenQuantity: Decimal` (required): The amount of tokens
-    - `specificHour: String` (optional): Hour of the current day when you want the token assignation. If this is undefined, it will set the current time.
-    - `specificMinute: String` (optional): Minute of the current day when you want the token assignation. The hour should be defined to apply this. If the hour is defined and this is undefined, it will be set to zero.
 
 # DATABASE
 
@@ -95,7 +93,6 @@ Please, check [this document](docs/edge-cases.md)
   - Ideally 80% coverage
   - The main thing to do would be to add integration tests for the exchange token and token assignation endpoints.
 - Create a cron service with [Node Cron](https://www.npmjs.com/package/node-cron) to execute the USD exchange automatically every day at the end of every hour.
-- Create another cron service that check at the end of every day that the total balances of every user that we have in the balances account is ok with the data that we have in JournalEntry table (please check [edge cases file](docs/edge-cases.md)).
 - Error tracking and actual logger (instead of console log). For doing this, I would use [Sentry](https://sentry.io/)
 - Use access tokens to access this API.
-- Check [edge cases file](docs/edge-cases.md)) and how to avoid it, in general.
+- Check [edge cases file](docs/edge-cases.md)) and how I would avoid them.

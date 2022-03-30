@@ -2,11 +2,11 @@
 
 ## Transactions
 
-Most of the things are inside the [Prisma Transaction](https://www.prisma.io/docs/concepts/components/prisma-client/transactions). So if any of the requests fails, it would not make the transaction. I added for tokensExchange and tokensAssignation files the transaction inside a try catch. What I would like to have is a process if any of the transaction file, making a notification that this specific user, has this specific problem. Also I would log that (using Sentry).
+All the DB transactions are inside the [Prisma Transaction](https://www.prisma.io/docs/concepts/components/prisma-client/transactions). So if any of the requests fails, it would not make the whole transaction. What I would like to have is notifications when it fails, that this specific user, has this specific problem. Also I would log that (using Sentry).
 
-In tokensExchange file, I have to separate the transaction of saving the balances from the savings of the other tables. This is because of an [error in Prisma](https://github.com/prisma/prisma/issues/11750). The main problem here is that it could update all the tables correctly but do not update the balances ok. That could cause luck of consistency.
+### Rollback for transactions that were completed
 
-I could create an endpoint/function to invalidate a whole transaction (in the tables JournalEntry and TokenTrasaction). We could have a column of isInvalidate (default `false`) for the different tables, and this, in the case of JournalEntry and TokenTrasaction, would be the only column that could be updated. I could use this endpoint/function every time I need to invalidate a transaction.
+I could create an endpoint/function to invalidate a whole transaction (in the tables JournalEntry and TokenTrasaction) in case it is necessary. We could have a column of isInvalidate (default `false`) for the different tables, and this, in the case of JournalEntry and TokenTrasaction, would be the only column that could be updated. I could use this endpoint/function every time I need to invalidate a transaction. This process could update the values in the balance tables, calculating again this with what we have in the JournalEntry table.
 
 Also, I would create a cron process that check that the data on JournalEntry table is ok with the data in the Balance tables (daily and account balance). If it is not ok, it would make notifications and update the balances with the data of JournalEntry table.
 

@@ -31,7 +31,6 @@ export const tokenHistoryForToday = async (req: Request, res: Response) => {
       amount: transaction.credit,
     })
   );
-  console.log({ tokenTransactionsHistory });
 
   res.json({ data: tokenTransactionsHistory });
 };
