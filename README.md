@@ -1,6 +1,24 @@
 # Description
 
-Node API to keep track of double-entry accounting ledgers for USD and DREAM tokens
+Node API to keep track of double-entry accounting ledgers for USD and DREAM tokens.
+
+## Dreamland project
+
+Dreamland is a meta verse company and has a concept of games, where every user can play these games and win DREAM tokens multiple times a day. A user can win upto 5 DREAM tokens on a single day.
+
+DREAM tokens are a virtual currency and have a real monetary value. At the end of every hour, the DREAM tokens won by the user are converted to USD by calling a third-party API that provides the rate (for this project, this value was hardcode to 15 cents per token).
+
+In this project, there are double-entry accounting ledgers that keep track of a user's tokens and the current USD value.
+
+## API defined
+
+The APIs defined in this repo addresses the following features (one point per API):
+
+- Accepts that a user has won some amount of DREAM token at a particular time of a day (can be fractional tokens)
+- Returns the history of DREAM tokens a user has won for the current day so far
+- Returns the history of USD amounts a user has won till now (till the previous day)
+- Returns the stats: sum of tokens won on the current day so far and the total value of USD a user has in his account.
+
 
 # Getting started
 
