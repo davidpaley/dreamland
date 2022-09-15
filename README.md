@@ -19,7 +19,6 @@ The APIs defined in this repo addresses the following features (one point per AP
 - Returns the history of USD amounts a user has won till now (till the previous day)
 - Returns the stats: sum of tokens won on the current day so far and the total value of USD a user has in his account.
 
-
 # Getting started
 
 ## 1. Clone the project and install dependencies
@@ -49,6 +48,12 @@ Run the following command to create your database file.
 
 ```
 npx prisma migrate dev
+```
+
+And, then, execute this for seeding the DB:
+
+```
+npx prisma db seed
 ```
 
 When `npx prisma migrate dev` is executed against a newly created database, seeding is also triggered. The seed file in [`prisma/seed.ts`](./prisma/seed.ts) will be executed and your database will be populated with the sample data.
