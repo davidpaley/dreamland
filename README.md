@@ -76,16 +76,15 @@ You could import in postman [this file](dreamland.postman_collection.json) `drea
 
 ### `GET`
 
-- `/api/token-history-for-today?userId={id}`: get the token history for today by it's user `id`
-- `/api/usd-history-for-today?userId={id}`: Fetch USD history by it's user `id`
-- `/api/stats?userId={id}`: Get the amount of token a user won today and the amount of USD that he/she has in their account by it's user `id`.
+- `/api/v1/user/:id/history`: get the token history of today for a user.
+- `/api/v1/user/:id/usd`: Fetch USD history for a user.
+- `/api/v1/user/:id/stats`: Get the number of tokens a user won today and the amount of USD that he/she has in their account.
 
 ### `POST`
 
-- `api/tokens-exchange`: Execute the exchange of all the tokens that the users have by USDs.
-- `api/tokens-assignation`: Set an amount of tokens to a specific user
+- `/api//v1/exchange`: Execute the exchange of all the tokens that the users have by USDs.
+- `/api/v1/user/:id/assignation`: Set an amount of tokens to a specific user.
   - Body:
-    - `userId: number` (required): The user ID
     - `tokenQuantity: Decimal` (required): The amount of tokens
 
 # DATABASE
