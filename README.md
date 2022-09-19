@@ -82,7 +82,7 @@ You could import in postman [this file](dreamland.postman_collection.json) `drea
 
 ### `POST`
 
-- `/api//v1/exchange`: Execute the exchange of all the tokens that the users have by USDs.
+- `/api/v1/exchange`: Execute the exchange of all the tokens that the users have by USDs.
 - `/api/v1/user/:id/assignation`: Set an amount of tokens to a specific user.
   - Body:
     - `tokenQuantity: Decimal` (required): The amount of tokens
