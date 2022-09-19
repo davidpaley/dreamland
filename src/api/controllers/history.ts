@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { ACCOUNT_IDS, LEDGER_IDS } from "../../constants/dataBase";
 
 export const tokenHistoryForToday = async (req: Request, res: Response) => {
-  const userId = parseInt(req.query.userId as string);
+  const userId = parseInt(req.params.id);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -36,7 +36,7 @@ export const tokenHistoryForToday = async (req: Request, res: Response) => {
 };
 
 export const usdHistory = async (req: Request, res: Response) => {
-  const userId = parseInt(req.query.userId as string);
+  const userId = parseInt(req.params.id);
   var today = new Date();
   today.setHours(0, 0, 0, 0);
   const usdEarnedThisDayRecord = await prisma.journalEntry.findMany({

@@ -4,7 +4,7 @@ import { getDailyBalanceId } from "../../utils/dates";
 import { ACCOUNT_IDS, LEDGER_IDS } from "../../constants/dataBase";
 
 export const statsAPI = async (req: Request, res: Response) => {
-  const userId = parseInt(req.query.userId as string);
+  const userId = parseInt(req.params.id);
   const dailyId = getDailyBalanceId();
   const tokenEarnedThisDayRecord = await prisma.dailyBalance.findUnique({
     where: {

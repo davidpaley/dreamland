@@ -14,7 +14,8 @@ import {
 } from "../../utils/database";
 
 export const tokensAssignationAPI = async (req: Request, res: Response) => {
-  const { userId, tokenQuantity } = req.body;
+  const userId = parseInt(req.params.id);
+  const { tokenQuantity } = req.body;
 
   const amount = new Prisma.Decimal(tokenQuantity);
   if (!userId || !tokenQuantity) {

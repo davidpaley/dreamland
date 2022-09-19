@@ -10,10 +10,10 @@ var jsonParser = bodyParser.json();
 
 const routes = Router();
 
-routes.post("/tokens-assignation", jsonParser, tokensAssignationAPI);
-routes.post("/tokens-exchange", jsonParser, tokensExchangeAPI);
-routes.get("/stats", statsAPI);
-routes.get("/token-history-for-today", tokenHistoryForToday);
-routes.get("/usd-history-for-today", usdHistory);
+routes.post("/v1/user/:id/assignation", jsonParser, tokensAssignationAPI);
+routes.post("/v1/exchange", jsonParser, tokensExchangeAPI);
+routes.get("/v1/user/:id/history", tokenHistoryForToday);
+routes.get("/v1/user/:id/stats", statsAPI);
+routes.get("/v1/user/:id/usd", usdHistory);
 
 export default routes;
