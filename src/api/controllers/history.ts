@@ -32,7 +32,7 @@ export const tokenHistoryForToday = async (req: Request, res: Response) => {
     })
   );
 
-  res.json({ data: tokenTransactionsHistory });
+  res.status(200).json({ data: tokenTransactionsHistory });
 };
 
 export const usdHistory = async (req: Request, res: Response) => {
@@ -59,5 +59,5 @@ export const usdHistory = async (req: Request, res: Response) => {
     time: transaction.date,
     amount: transaction.credit,
   }));
-  res.json({ data: usdTransactionsHistory });
+  res.status(200).json({ data: usdTransactionsHistory });
 };

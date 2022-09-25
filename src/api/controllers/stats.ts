@@ -26,7 +26,7 @@ export const statsAPI = async (req: Request, res: Response) => {
       },
     },
   });
-  res.json({
+  res.status(200).json({
     data: {
       tokensWonOnCurrentDay: tokenEarnedThisDayRecord?.credit || 0,
       totalUsdInAccount: usdAmountRecord
